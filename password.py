@@ -9,6 +9,14 @@ min = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'
 
 maj = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
+try :
+    f = open ("list_de_mot_de_pass.json", "r")
+    f.close()
+except:
+    f = open ("list_de_mot_de_pass.json", "w")
+    json.dump ([], f)
+    f.close()
+
 #verification des types de saisie
 def is_number(d):
     try:
@@ -42,41 +50,27 @@ def password ():
 
 
 #fonction de sauvegarde
-def sauvegard (cript):
+def sauvegard (hashed):
+    with open("list_de_mot_de_pass.json", "r") as file:
+        cont = json.load(file)
 
-    try :
+    while str(hashed) in cont :
+        print ("le mot de passe existe deja")
+        hashed = hashlib.sha256 (password ().encode('UTF-8')).hexdigest()
 
-        cont = []
-        with open("list_de_mot_de_pass.json", "r") as file:
-            for ligne in file:
-                cont.append (json.loads(ligne))
-
-        while cript in cont :
-            print ("le mot de passe existe deja")
-            cript = [hashlib.sha256 (password ().encode('UTF-8')).hexdigest()]
+    cont.append (hashed)
 
 
+    with open("list_de_mot_de_pass.json", "w") as file:
+        json.dump(cont, file)
 
-        with open("list_de_mot_de_pass.json", "a") as file:
-            json.dump(cript, file)
-            file.write('\n')
-        
-    
-    except:
-        print ("le ficier sauvegarde de mot de pass nexiste pas on la crer")
-        with open("list_de_mot_de_pass.json", "w") as file:
-            json.dump(cript, file)
-            file.write('\n')
 
 #fonction daffichage
 def affiche ():
 
     try :
-
-        cont = []
         with open("list_de_mot_de_pass.json", "r") as file:
-            for ligne in file:
-                cont.append (json.loads(ligne))
+                cont = json.load(file)
         print (cont)
         
     
@@ -115,11 +109,12 @@ def random_mot ():
 
     return result
 
+#utilisation du generateur de mot de passe
 def ut_rand (x):
     for i in range (x) :
         ran = random_mot ()
-        print ("mot de passe aleatoir ", i, " ", ran)
-        sauvegard (ran)
+        print ("mot de passe aleatoir ", i+1, " est ", ran)
+        sauvegard ( hashlib.sha256 (ran.encode('UTF-8')).hexdigest())
 
 
 
@@ -127,23 +122,29 @@ def ut_rand (x):
 #programe principal
 
 #hashashe du mot de passe
-cript = [hashlib.sha256 (password ().encode('UTF-8')).hexdigest()]
+hashed = hashlib.sha256 (password ().encode('UTF-8')).hexdigest()
 
 #affichage
-print ("le mot de passe hasher est : \n", cript)
-
-#creation des mot de passe aleatoire
-ut_rand (5)#5 est le nombre de mot de passe a crer
+print ("le mot de passe hasher est : \n", hashed)
 
 
+
+#sauvegarde du mot de passe
 chois = input ("vouler vous enregistrer ce mot de passe hasher oui ou non : \n")
 while not (chois == "oui" or chois == "non"):
     chois = input ("vouler vous enregistrer ce mot de passe hasher oui ou non : \n")
 
 if chois == "oui":
 
-    sauvegard (cript)
+    sauvegard (hashed)
 
+
+
+
+#creation des mot de passe aleatoire
+ut_rand (5)#5 est le nombre de mot de passe a crer
+
+#affichage du mot de passe
 chois = input ("vouler vous afficher les mot de passe hasher oui ou non : \n")
 while not (chois == "oui" or chois == "non"):
     chois = input ("vouler vous afficher les mot de passe hasher oui ou non : \n")
